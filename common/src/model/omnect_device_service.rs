@@ -5,3 +5,9 @@ use serde::{Deserialize, Serialize};
 pub struct VersionResponse {
     pub version: String,
 }
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct RebootResponse {
+    pub result: bool,
+}
