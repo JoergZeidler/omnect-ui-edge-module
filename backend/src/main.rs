@@ -2,6 +2,7 @@ mod api;
 
 use api::omnect_device_service::get_version;
 use api::omnect_device_service::put_reboot;
+use api::omnect_device_service::put_restart_network;
 
 use actix_web::{middleware::Logger, web::scope, App, HttpServer};
 use actix_web_lab::web::spa;
@@ -17,7 +18,12 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .wrap(logger)
-            .service(scope("/api").service(get_version).service(put_reboot))
+            .service(
+                scope("/api")
+                    .service(get_version)
+                    .service(put_reboot)
+                    .service(put_restart_network),
+            )
             .service(
                 spa()
                     .index_file("./dist/index.html")
