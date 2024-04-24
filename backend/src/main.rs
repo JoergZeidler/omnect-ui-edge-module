@@ -1,38 +1,40 @@
-mod api;
+pub mod backend;
 
-use api::omnect_device_service::get_version;
-use api::omnect_device_service::put_reboot;
-use api::omnect_device_service::put_restart_network;
+use env_logger::{Builder, Env, Target};
+use log::{error, info};
+use std::io::Write;
+use std::process;
 
-use actix_web::{middleware::Logger, web::scope, App, HttpServer};
-use actix_web_lab::web::spa;
+#[tokio::main]
+async fn main() {
+    let mut builder;
+    log_panics::init();
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "debug");
-    std::env::set_var("RUST_BACKTRACE", "1");
-    env_logger::init();
+    if cfg!(debug_assertions) {
+        builder = Builder::from_env(Env::default().default_filter_or("debug"));
+    } else {
+        builder = Builder::from_env(Env::default().default_filter_or("info"));
+    }
 
-    HttpServer::new(move || {
-        let logger = Logger::default();
+    builder.format(|f, record| match record.level() {
+        log::Level::Error => {
+            eprintln!("{}", record.args());
+            Ok(())
+        }
+        _ => {
+            writeln!(f, "{}", record.args())
+        }
+    });
 
-        App::new()
-            .wrap(logger)
-            .service(
-                scope("/api")
-                    .service(get_version)
-                    .service(put_reboot)
-                    .service(put_restart_network),
-            )
-            .service(
-                spa()
-                    .index_file("./dist/index.html")
-                    .static_resources_mount("/")
-                    .static_resources_location("./dist")
-                    .finish(),
-            )
-    })
-    .bind(("0.0.0.0", 8888))?
-    .run()
-    .await
+    builder.target(Target::Stdout).init();
+
+    info!("module version: {}", env!("CARGO_PKG_VERSION"));
+
+    if let Err(e) = backend::run().await {
+        error!("application error: {e:#}");
+
+        process::exit(1);
+    }
+
+    info!("application shutdown")
 }
