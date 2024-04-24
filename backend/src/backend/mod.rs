@@ -51,7 +51,7 @@ pub async fn run() -> Result<()> {
     let mut signals = Signals::new(TERM_SIGNALS)?;
 
     let web_service = WebService::new(tx_web_service.clone());
-    let socket = "/tmp/my.sock";
+    let socket = "/run/omnect-device-service/api.sock";
     let socket_client: SocketClient = SocketClient::open(socket);
 
     loop {
