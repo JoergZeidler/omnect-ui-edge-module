@@ -1,6 +1,6 @@
 use crate::backend::error::{SocketError, SocketResult};
 use common::model::omnect_device_service::{
-    RebootResponse, RestartNetworkResponse, VersionResponse,
+    RebootResponse, ReloadNetworkResponse, VersionResponse,
 };
 
 use crate::backend::http::SocketConnection;
@@ -49,10 +49,10 @@ impl SocketClient {
             },
         }
     }
-    pub async fn put_restart_network(&self) -> SocketResult<RestartNetworkResponse> {
+    pub async fn put_reload_network(&self) -> SocketResult<ReloadNetworkResponse> {
         let connection: SocketConnection = SocketConnection::open(&self.socket).await?;
 
-        match connection.put("/restart-network").await {
+        match connection.put("/reload-network").await {
             Ok(response) => match response.into_json().await {
                 Ok(value) => Ok(value),
                 Err(error) => Err(error),

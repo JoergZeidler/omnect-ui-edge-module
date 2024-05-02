@@ -8,8 +8,8 @@ pub struct VersionResponse {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Version {
-    pub osName: String,
-    pub swVersion: String,
+    pub os_name: String,
+    pub sw_version: String,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
@@ -20,6 +20,6 @@ pub struct RebootResponse {
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct RestartNetworkResponse {
+pub struct ReloadNetworkResponse {
     pub result: bool,
 }

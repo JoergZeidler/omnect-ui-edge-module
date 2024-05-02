@@ -7,7 +7,7 @@ use tokio::sync::{mpsc, oneshot};
 pub enum Command {
     Reboot(Reply),
     GetOsVersion(Reply),
-    RestartNetwork(Reply),
+    ReloadNetwork(Reply),
 }
 
 type Reply = oneshot::Sender<serde_json::Value>;
@@ -23,7 +23,7 @@ impl WebService {
                 .app_data(web::Data::new(tx_request.clone()))
                 .route("/api/reboot", web::put().to(Self::reboot))
                 .route("/api/os-version", web::get().to(Self::os_version))
-                .route("/api/restart-network", web::put().to(Self::restart_network))
+                .route("/api/reload-network", web::put().to(Self::reload_network))
                 .service(
                     spa()
                         .index_file("./dist/index.html")
@@ -66,9 +66,9 @@ impl WebService {
             .body(rx_reply.await.unwrap().to_string())
     }
 
-    async fn restart_network(tx_request: web::Data<mpsc::Sender<Command>>) -> impl Responder {
+    async fn reload_network(tx_request: web::Data<mpsc::Sender<Command>>) -> impl Responder {
         let (tx_reply, rx_reply) = oneshot::channel();
-        let cmd = Command::RestartNetwork(tx_reply);
+        let cmd = Command::ReloadNetwork(tx_reply);
 
         tx_request.send(cmd).await.unwrap();
 

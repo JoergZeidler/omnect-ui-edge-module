@@ -32,9 +32,9 @@ async fn handle_web_service_request(
             reply,
             json!(omnect_device_service::put_reboot(&socket_client).await),
         ),
-        web_service::Command::RestartNetwork(reply) => (
+        web_service::Command::ReloadNetwork(reply) => (
             reply,
-            json!(omnect_device_service::put_restart_network(&socket_client).await),
+            json!(omnect_device_service::put_reload_network(&socket_client).await),
         ),
     };
 
